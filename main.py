@@ -3,6 +3,9 @@ import os
 from tkinter import *
 from tkinter import filedialog
 import tkinter.messagebox as mb
+import base64
+
+
 
 formWidth=170
 formHeight=90
@@ -28,24 +31,14 @@ def getImgWay():
     inputImg.insert(0,way)
     printFileSize()
 
-def ImgToDec(path):
+def createBase64(path):
     with open(path, "rb") as image:
-        b = bytearray(image.read())
-        s=""
-        for i in b:
-          s+=str(i)+" ";
-        s=s.strip()
-        return s
+        b = base64.b64encode(image.read())
+    return b
 
-def createHexCode(decCode):
-    textArr16=[]
-    sep = ""
-    for i in decCode.split():
-        textArr16.append('0' + str(hex(int(i)))[2:] if len(str(hex(int(i)))[2:]) == 1 else str(hex(int(i)))[2:])
-    return sep.join(textArr16).replace("00","z")
 
 def createPattern(imgPath):
-    pattern=r'data:text/html,<img id="a"><script>document.getElementById("a").src="data:image/png;base64," + btoa(String.fromCharCode.apply(null, new Uint8Array("'+createHexCode(ImgToDec(imgPath))+'".replace(/z/g,"00").match(/.{1,2}/g).map(x=>parseInt(x,16)))));</script>'
+    pattern=r'data:text/html,<img id="a" src="data:image/png;base64,'+str(createBase64(imgPath))[2:-1]+"\">"
     return pattern
 
 def createQRCode(text,saveWay):
@@ -63,5 +56,4 @@ def workPreparation():
 
 buttonResult = Button(root,text="QRCODE",width=10,command=workPreparation)
 buttonResult.place(x=45,y=55)
-
 root.mainloop()
